@@ -18,12 +18,12 @@
           </button>
         </div>
       </div>
-      <LabeledInput class="key-input" type="text" :status="this.orgID !== '' ? '' : 'error'"
-        v-model:value="orgID" required>
+      <LabeledInput class="key-input" type="text" :status="this.orgID !== '' ? '' : 'error'" v-model:value="orgID"
+        required>
         <template #label>Codezero Organization ID</template>
       </LabeledInput>
-      <LabeledInput class="key-input" type="text" :status="this.apiKey !== '' ? '' : 'error'"
-        v-model:value="apiKey" required>
+      <LabeledInput class="key-input" type="text" :status="this.apiKey !== '' ? '' : 'error'" v-model:value="apiKey"
+        required>
         <template #label>Codezero API Key</template>
       </LabeledInput>
     </header>
@@ -49,7 +49,8 @@
 <script>
 import Loading from '@shell/components/Loading';
 import ResourceTable from '@shell/components/ResourceTable';
-import { CATALOG, MANAGEMENT } from '@shell/config/types';
+import { createHelmRepository, getHelmRepositoryExact, refreshHelmRepository } from '@shell/utils/uiplugins';
+import { MANAGEMENT } from '@shell/config/types';
 
 const states = {
   installed: 'Installed',
@@ -190,9 +191,7 @@ export default {
     async installCodezero(row) {
       try {
         const repo = await getHelmRepositoryExact(this.$store, 'https://charts.codezero.io')
-        if (repo) {
-          // await refreshHelmRepository(this.$store, 'https://charts.codezero.io');
-        } else {
+        if (!repo) {
           repo = await createHelmRepository(this.$store, 'codezero', 'https://charts.codezero.io');
         }
         console.log('Using Helm repository:', repo);
