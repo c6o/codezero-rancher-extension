@@ -141,7 +141,7 @@ export default {
         console.log('store: ', this.$store);
         console.log('getCodezeroState: Found apps:', apps);
 
-        const app = apps.data?.find(app => app.id === 'codezero/codezero');
+        const app = apps.data?.find(app => app.metadata.name === 'codezero');
 
         if (!app) {
           return { state: states.notInstalled };
