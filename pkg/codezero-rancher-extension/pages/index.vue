@@ -102,6 +102,7 @@ export default {
             id: cluster.id,
             name: cluster.spec.displayName,
             state: states.checking,
+            version: undefined,
             cluster: cluster,
             installing: false,
             uninstalling: false,
