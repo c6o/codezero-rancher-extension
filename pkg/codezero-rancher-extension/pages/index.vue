@@ -143,7 +143,7 @@ export default {
           return { state: states.notInstalled };
         }
 
-        console.log('Found app:', app);
+        console.log('getCodezeroState: Found app:', app);
 
         const version = app.metadata.labels?.['app.kubernetes.io/version'];
 
