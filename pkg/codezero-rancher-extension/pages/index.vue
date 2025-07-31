@@ -39,7 +39,6 @@
 </template>
 
 <script>
-import { reactive } from 'vue';
 import Loading from '@shell/components/Loading';
 import ResourceTable from '@shell/components/ResourceTable';
 import { MANAGEMENT } from '@shell/config/types';
@@ -68,7 +67,7 @@ export default {
 
   data() {
     return {
-      clusters: reactive([]),
+      clusters: [],
       headers: [
         {
           name: 'name',
@@ -93,7 +92,7 @@ export default {
       try {
         const clusters = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.CLUSTER });
 
-        this.clusters = reactive(clusters.map((cluster) => {
+        this.clusters = clusters.map((cluster) => {
           console.log('Processing cluster:', cluster)
           if (cluster.metadata.state.name !== 'active') {
             return null;
@@ -116,7 +115,7 @@ export default {
           this.refreshSingleCluster(row);
 
           return row;
-        }).filter(row => row !== null));
+        }).filter(row => row !== null);
       } catch (error) {
         console.error('Error loading clusters:', error);
         this.$store.dispatch('growl/fromError', {
@@ -316,7 +315,6 @@ export default {
 
     async refreshSingleCluster(row) {
       console.log('Refreshing cluster:', row.cluster);
-      row.state = states.checking;
       const { state, version } = await this.getCodezeroState(row.cluster);
       console.log('Cluster state:', state, 'Version:', version);
       row.state = state;
