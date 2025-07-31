@@ -102,7 +102,7 @@ export default {
             id: cluster.id,
             name: cluster.spec.displayName,
             state: states.checking,
-            version: undefined,
+            app: null,
             cluster: cluster,
             installing: false,
             uninstalling: false,
@@ -133,15 +133,15 @@ export default {
           clusterId = clusterId.split('/').pop(); // Get the part after the last slash
         }
 
-        const apps = await this.$store.dispatch('management/findAll', { type: CATALOG.APP, clusterId });
+        
+        const apps = await this.$store.dispatch('cluster/request', {
+          url: `/k8s/clusters/${clusterId}/v1/catalog.cattle.io.apps?exclude=metadata.managedFields`,
+        });
 
         console.log('store: ', this.$store);
         console.log('getCodezeroState: Found apps:', apps);
 
-        const app = apps.data?.find(app =>
-          app.metadata?.name === 'spaceagent' ||
-          app.metadata?.labels?.['app.kubernetes.io/part-of'] === 'codezero'
-        );
+        const app = apps.data?.find(app => app.id === 'codezero/codezero');
 
         if (!app) {
           return { state: states.notInstalled };
@@ -149,14 +149,12 @@ export default {
 
         console.log('getCodezeroState: Found app:', app);
 
-        const version = app.metadata.labels?.['app.kubernetes.io/version'];
-
         if (app.metadata.state.error) {
-          return { state: states.error };
-        } else if (app.metadata.state.name === 'active') {
-          return { state: states.installed, version };
+          return { state: states.error, app };
+        } else if (app.metadata.state.name === 'deployed') {
+          return { state: states.installed, app };
         } else {
-          return { state: states.installing, version };
+          return { state: states.installing, app };
         }
       } catch (error) {
         console.warn(`Could not check Codezero installation for cluster ${cluster.id}:`, error);
@@ -295,7 +293,7 @@ export default {
 
         // Delete Helm chart
         await this.$store.dispatch('cluster/request', {
-          url: `/k8s/clusters/${clusterId}/apis/helm.cattle.io/v1/helmcharts/kube-system/codezero`,
+          url: row.app.actions.uninstall,
           method: 'DELETE'
         });
 
@@ -317,11 +315,9 @@ export default {
     },
 
     async refreshSingleCluster(row) {
-      console.log('Refreshing cluster:', row.cluster);
-      const { state, version } = await this.getCodezeroState(row.cluster);
-      console.log('Cluster state:', state, 'Version:', version);
+      const { state, app } = await this.getCodezeroState(row.cluster);
       row.state = state;
-      row.version = version;
+      row.app = app;
 
       row.availableActions = [
         {
