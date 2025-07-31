@@ -41,7 +41,7 @@
 <script>
 import Loading from '@shell/components/Loading';
 import ResourceTable from '@shell/components/ResourceTable';
-import { MANAGEMENT } from '@shell/config/types';
+import { CATALOG, MANAGEMENT } from '@shell/config/types';
 
 const states = {
   installed: 'Installed',
@@ -133,7 +133,9 @@ export default {
           clusterId = clusterId.split('/').pop(); // Get the part after the last slash
         }
 
-        const apps = await this.$store.dispatch('cluster/request', { url: `/k8s/clusters/${clusterId}/v1/services` });
+        const apps = await this.$store.dispatch('management/findAll', { type: CATALOG.APP, clusterId });
+        
+        console.log('getCodezeroState: Found apps:', apps);
 
         const app = apps.data?.find(app =>
           app.metadata?.name === 'spaceagent' ||
