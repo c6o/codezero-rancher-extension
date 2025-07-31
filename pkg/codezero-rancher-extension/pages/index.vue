@@ -133,7 +133,7 @@ export default {
           clusterId = clusterId.split('/').pop(); // Get the part after the last slash
         }
 
-        
+
         const apps = await this.$store.dispatch('cluster/request', {
           url: `/k8s/clusters/${clusterId}/v1/catalog.cattle.io.apps?exclude=metadata.managedFields`,
         });
@@ -194,23 +194,8 @@ export default {
           repo = await createHelmRepository(this.$store, 'codezero', 'https://charts.codezero.io');
         }
         console.log('Using Helm repository:', repo);
-        // const chart = {
-        //   name: 'codezero',
-        //   version: '', // Use latest version or specify a version
-        //   repoType: repo.metadata.type,
-        //   repoName: repo.metadata.name,
-        // }
-        // await installHelmChart(repo, chart, {
-        //   org: {
-        //     id: 'some-id',
-        //     apikey: 'some-apikey',
-        //   },
-        //   space: {
-        //     name: 'rancher-test',
-        //   }
-        // }, 'codezero', 'install');
 
-        const payload = {
+        const data = {
           charts: [
             {
               chartName: 'codezero',
@@ -239,31 +224,10 @@ export default {
           skipCRDs: false
         };
 
-        // const getCookie = (name) => {
-        //   const value = `; ${document.cookie}`;
-        //   const parts = value.split(`; ${name}=`);
-        //   if (parts.length === 2) {
-        //     return parts.pop()?.split(';').shift() || '';
-        //   }
-        //   return '';
-        // };
-
-        // const csrfToken = getCookie('CSRF') || '';
-        // fetch(`/k8s/clusters/${clusterId}/v1/catalog.cattle.io.clusterrepos/${repo.id}?action=install`, {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     'Accept': 'application/json',
-        //     'x-api-csrf': csrfToken
-        //   },
-        //   credentials: 'include',
-        //   body: JSON.stringify(payload)
-        // })
-        
         this.$store.dispatch('cluster/request', {
           url: `/k8s/clusters/${clusterId}/v1/catalog.cattle.io.clusterrepos/${repo.id}?action=install`,
           method: 'POST',
-          body: payload,
+          data,
         })
 
         // Update state optimistically
@@ -300,7 +264,8 @@ export default {
         // Delete Helm chart
         await this.$store.dispatch('cluster/request', {
           url: row.app.actions.uninstall,
-          method: 'POST'
+          method: 'POST',
+          data: {},
         });
 
         // Update state optimistically
