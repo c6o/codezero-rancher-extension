@@ -239,25 +239,31 @@ export default {
           skipCRDs: false
         };
 
-        const getCookie = (name) => {
-          const value = `; ${document.cookie}`;
-          const parts = value.split(`; ${name}=`);
-          if (parts.length === 2) {
-            return parts.pop()?.split(';').shift() || '';
-          }
-          return '';
-        };
+        // const getCookie = (name) => {
+        //   const value = `; ${document.cookie}`;
+        //   const parts = value.split(`; ${name}=`);
+        //   if (parts.length === 2) {
+        //     return parts.pop()?.split(';').shift() || '';
+        //   }
+        //   return '';
+        // };
 
-        const csrfToken = getCookie('CSRF') || '';
-        fetch(`/k8s/clusters/${clusterId}/v1/catalog.cattle.io.clusterrepos/${repo.id}?action=install`, {
+        // const csrfToken = getCookie('CSRF') || '';
+        // fetch(`/k8s/clusters/${clusterId}/v1/catalog.cattle.io.clusterrepos/${repo.id}?action=install`, {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //     'Accept': 'application/json',
+        //     'x-api-csrf': csrfToken
+        //   },
+        //   credentials: 'include',
+        //   body: JSON.stringify(payload)
+        // })
+        
+        this.$store.dispatch('cluster/request', {
+          url: `/k8s/clusters/${clusterId}/v1/catalog.cattle.io.clusterrepos/${repo.id}?action=install`,
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'x-api-csrf': csrfToken
-          },
-          credentials: 'include',
-          body: JSON.stringify(payload)
+          body: payload,
         })
 
         // Update state optimistically
@@ -294,7 +300,7 @@ export default {
         // Delete Helm chart
         await this.$store.dispatch('cluster/request', {
           url: row.app.actions.uninstall,
-          method: 'DELETE'
+          method: 'POST'
         });
 
         // Update state optimistically
