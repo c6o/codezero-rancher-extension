@@ -18,14 +18,16 @@
           </button>
         </div>
       </div>
-      <LabeledInput class="key-input" type="text" :status="this.orgID !== '' ? '' : 'error'" v-model:value="orgID"
-        required>
-        <template #label>Codezero Organization ID</template>
-      </LabeledInput>
-      <LabeledInput class="key-input" type="text" :status="this.apiKey !== '' ? '' : 'error'" v-model:value="apiKey"
-        required>
-        <template #label>Codezero API Key</template>
-      </LabeledInput>
+      <SimpleBox class="simplebox-centering">
+        <LabeledInput class="key-input" type="text" :status="this.orgID !== '' ? '' : 'error'" v-model:value="orgID"
+          required>
+          <template #label>Codezero Organization ID</template>
+        </LabeledInput>
+        <LabeledInput class="key-input" type="text" :status="this.apiKey !== '' ? '' : 'error'" v-model:value="apiKey"
+          required>
+          <template #label>Codezero API Key</template>
+        </LabeledInput>
+      </SimpleBox>
     </header>
 
     <ResourceTable :rows="clusters" :headers="headers" :loading="$fetchState.pending || refreshing" :search="true"
