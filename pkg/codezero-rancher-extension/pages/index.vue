@@ -134,7 +134,8 @@ export default {
         }
 
         const apps = await this.$store.dispatch('management/findAll', { type: CATALOG.APP, clusterId });
-        
+
+        console.log('store: ', this.$store);
         console.log('getCodezeroState: Found apps:', apps);
 
         const app = apps.data?.find(app =>
