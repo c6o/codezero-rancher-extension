@@ -18,6 +18,14 @@
           </button>
         </div>
       </div>
+      <LabeledInput class="key-input" type="text" :status="this.orgID !== '' ? '' : 'error'"
+        v-model:value="orgID" required>
+        <template #label>Codezero Organization ID</template>
+      </LabeledInput>
+      <LabeledInput class="key-input" type="text" :status="this.apiKey !== '' ? '' : 'error'"
+        v-model:value="apiKey" required>
+        <template #label>Codezero API Key</template>
+      </LabeledInput>
     </header>
 
     <ResourceTable :rows="clusters" :headers="headers" :loading="$fetchState.pending || refreshing" :search="true"
@@ -68,6 +76,8 @@ export default {
   data() {
     return {
       clusters: [],
+      orgID: '',
+      apiKey: '',
       headers: [
         {
           name: 'name',
@@ -164,16 +174,14 @@ export default {
 
     getStateColor(state) {
       switch (state) {
-        case 'Installed':
+        case states.installed:
           return 'success';
-        case 'Not Installed':
+        case states.notInstalled:
           return 'warning';
-        case 'Installing':
+        case states.installing:
           return 'info';
-        case 'Failed':
+        case states.error:
           return 'error';
-        case 'Unavailable':
-        case 'Unknown':
         default:
           return 'muted';
       }
@@ -181,12 +189,6 @@ export default {
 
     async installCodezero(row) {
       try {
-        // Extract the actual cluster name, handling fleet-local/ prefix
-        let clusterId = row.cluster.id || row.cluster.metadata?.name;
-        if (clusterId && clusterId.includes('/')) {
-          clusterId = clusterId.split('/').pop(); // Get the part after the last slash
-        }
-
         const repo = await getHelmRepositoryExact(this.$store, 'https://charts.codezero.io')
         if (repo) {
           // await refreshHelmRepository(this.$store, 'https://charts.codezero.io');
@@ -199,18 +201,18 @@ export default {
           charts: [
             {
               chartName: 'codezero',
-              version: '1.11.4', // Use latest version or specify a version
+              version: '', // Use latest version or specify a version
               annotations: {
                 "catalog.cattle.io/ui-source-repo-type": "cluster",
                 "catalog.cattle.io/ui-source-repo": repo.id
               },
               values: {
                 org: {
-                  id: 'someid',
-                  apikey: 'somekey',
+                  id: this.orgID,
+                  apikey: this.apiKey,
                 },
                 space: {
-                  name: 'rancher-test',
+                  name: cluster.spec.displayName,
                 }
               }
             }
@@ -218,7 +220,7 @@ export default {
           noHooks: false,
           timeout: "600s",
           wait: true,
-          namespace: "codezero", //this.value.metadata.namespace || "default",
+          namespace: "codezero",
           // projectId: `${clusterId}/${projectId}`,
           disableOpenAPIValidation: false,
           skipCRDs: false
@@ -255,12 +257,6 @@ export default {
 
     async uninstallCodezero(row) {
       try {
-        // Extract the actual cluster name, handling fleet-local/ prefix
-        let clusterId = row.cluster.id || row.cluster.metadata?.name;
-        if (clusterId && clusterId.includes('/')) {
-          clusterId = clusterId.split('/').pop(); // Get the part after the last slash
-        }
-
         // Delete Helm chart
         await this.$store.dispatch('cluster/request', {
           url: row.app.actions.uninstall,
