@@ -18,18 +18,17 @@
           </button>
         </div>
       </div>
-      <SimpleBox class="simplebox-centering">
-        <LabeledInput class="key-input" type="text" :status="this.orgID !== '' ? '' : 'error'" v-model:value="orgID"
-          required>
-          <template #label>Codezero Organization ID</template>
-        </LabeledInput>
-        <LabeledInput class="key-input" type="text" :status="this.apiKey !== '' ? '' : 'error'" v-model:value="apiKey"
-          required>
-          <template #label>Codezero API Key</template>
-        </LabeledInput>
-      </SimpleBox>
     </header>
-
+    <div>
+      <SimpleBox class="simplebox-centering">
+        <p class="mb-10">
+          You can obtain the Organization ID and API Key from the API Keys menu in the <a href="https://hub.codezero.io"
+            target="_blank">Codezero Hub</a>.
+        </p>
+        <LabeledInput class="mb-10" v-model:value="orgID" label="Codezero Organization ID" required />
+        <LabeledInput v-model:value="apiKey" label="Codezero API Key" required />
+      </SimpleBox>
+    </div>
     <ResourceTable :rows="clusters" :headers="headers" :loading="$fetchState.pending || refreshing" :search="true"
       :table-actions="false" key-field="id" default-sort-by="name" :row-actions="true">
       <template #cell:name="{ row }">
@@ -49,6 +48,8 @@
 </template>
 
 <script>
+import SimpleBox from '@shell/components/SimpleBox';
+import { LabeledInput } from '@components/Form/LabeledInput';
 import Loading from '@shell/components/Loading';
 import ResourceTable from '@shell/components/ResourceTable';
 import { createHelmRepository, getHelmRepositoryExact, refreshHelmRepository } from '@shell/utils/uiplugins';
@@ -69,7 +70,9 @@ export default {
 
   components: {
     Loading,
-    ResourceTable
+    ResourceTable,
+    SimpleBox,
+    LabeledInput,
   },
 
   async fetch() {
