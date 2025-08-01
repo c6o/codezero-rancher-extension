@@ -108,6 +108,8 @@ export default {
       try {
         const clusters = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.CLUSTER });
 
+        console.log("Store: ", this.$store);
+
         this.clusters = clusters.map((cluster) => {
           console.log('Processing cluster:', cluster)
           if (cluster.metadata.state.name !== 'active') {
@@ -188,11 +190,18 @@ export default {
 
     async installCodezero(row) {
       try {
-        let repo = await getHelmRepositoryExact(this.$store, 'https://charts.codezero.io')
+        const repos = await this.$store.dispatch('cluster/request', {
+          url: `/k8s/clusters/${cluster.id}/v1/catalog.cattle.io.clusterrepos?exclude=metadata.managedFields`,
+        });
+
+        let repo = repos.data.find(r => (r.spec?.gitBranch ? r.spec?.gitRepo : r.spec?.url) === 'https://charts.codezero.io');
         if (!repo) {
-          repo = await createHelmRepository(this.$store, 'codezero', 'https://charts.codezero.io');
+          repo = await this.$store.dispatch('cluster/request', {
+            url: `/k8s/clusters/${row.cluster.id}/v1/catalog.cattle.io.clusterrepos`,
+            method: 'POST',
+            data: { type: "catalog.cattle.io.clusterrepo", metadata: { name: "codezero" }, spec: { clientSecret: null, url: "https://charts.codezero.io" } },
+          });
         }
-        console.log('Using Helm repository:', repo);
 
         const data = {
           charts: [
