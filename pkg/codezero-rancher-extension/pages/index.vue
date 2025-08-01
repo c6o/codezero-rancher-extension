@@ -195,7 +195,7 @@ export default {
 
     async installCodezero(row) {
       try {
-        const repo = await getHelmRepositoryExact(this.$store, 'https://charts.codezero.io')
+        let repo = await getHelmRepositoryExact(this.$store, 'https://charts.codezero.io')
         if (!repo) {
           repo = await createHelmRepository(this.$store, 'codezero', 'https://charts.codezero.io');
         }
