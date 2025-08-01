@@ -180,6 +180,13 @@ export default {
     },
 
     async installCodezero(row) {
+      if (this.orgID === '' || this.apiKey === '') {
+        this.$store.dispatch('growl/error', {
+          title: this.t('codezero.error.missingCredentials')
+        }, { root: true });
+        return;
+      }
+
       try {
         row.state = states.installing;
 

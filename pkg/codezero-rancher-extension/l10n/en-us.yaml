@@ -17,3 +17,4 @@ codezero:
     install: "Failed to install Codezero on cluster {cluster}"
     uninstall: "Failed to uninstall Codezero from cluster {cluster}"
     clusterNotReady: "Cluster {cluster} is not ready"
+    missingCredentials: "Please set your organization ID and API key."
