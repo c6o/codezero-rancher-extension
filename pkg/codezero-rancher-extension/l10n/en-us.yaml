@@ -12,7 +12,6 @@ codezero:
   success:
     installed: "Codezero successfully installed on cluster {cluster}"
     uninstalled: "Codezero successfully uninstalled from cluster {cluster}"
-    installStarted: "Codezero installation started on cluster {cluster}"
   error:
     loadClusters: "Failed to load clusters"
     install: "Failed to install Codezero on cluster {cluster}"

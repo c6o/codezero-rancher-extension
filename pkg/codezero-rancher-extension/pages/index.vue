@@ -107,10 +107,7 @@ export default {
       try {
         const clusters = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.CLUSTER });
 
-        console.log("Store: ", this.$store);
-
         this.clusters = clusters.map((cluster) => {
-          console.log('Processing cluster:', cluster)
           if (cluster.metadata.state.name !== 'active') {
             return null;
           }
@@ -148,16 +145,11 @@ export default {
           url: `/k8s/clusters/${cluster.id}/v1/catalog.cattle.io.apps?exclude=metadata.managedFields`,
         });
 
-        console.log('store: ', this.$store);
-        console.log('getCodezeroState: Found apps:', apps);
-
         const app = apps.data?.find(app => app?.spec?.chart?.metadata?.name === 'codezero');
 
         if (!app) {
           return { state: states.notInstalled };
         }
-
-        console.log('getCodezeroState: Found app:', app);
 
         if (app.metadata.state.error) {
           return { state: states.error, app };
@@ -189,6 +181,8 @@ export default {
 
     async installCodezero(row) {
       try {
+        row.state = states.installing;
+
         const repos = await this.$store.dispatch('cluster/request', {
           url: `/k8s/clusters/${row.cluster.id}/v1/catalog.cattle.io.clusterrepos?exclude=metadata.managedFields`,
         });
@@ -226,31 +220,23 @@ export default {
           timeout: "600s",
           wait: true,
           namespace: "codezero",
-          // projectId: `${row.cluster.id}/${projectId}`,
           disableOpenAPIValidation: false,
           skipCRDs: false
         };
 
-        this.$store.dispatch('cluster/request', {
+        await this.$store.dispatch('cluster/request', {
           url: `/k8s/clusters/${row.cluster.id}/v1/catalog.cattle.io.clusterrepos/${repo.id}?action=install`,
           method: 'POST',
           data,
-        })
+        });
 
-        // Update state optimistically
-        row.state = states.installing;
+        row.state = states.installed;
 
         this.$store.dispatch('growl/success', {
-          title: this.t('codezero.success.installStarted', { cluster: row.name })
+          title: this.t('codezero.success.installed', { cluster: row.name })
         }, { root: true });
 
-        // Refresh after a delay to check actual status
-        setTimeout(() => {
-          this.refreshSingleCluster(row);
-        }, 5000);
-
       } catch (error) {
-        console.log(error)
         this.$store.dispatch('growl/fromError', {
           title: this.t('codezero.error.install', { cluster: row.name }),
           err: error
@@ -262,6 +248,8 @@ export default {
 
     async uninstallCodezero(row) {
       try {
+        row.state = states.uninstalling;
+
         // Delete Helm chart
         await this.$store.dispatch('cluster/request', {
           url: row.app.actions.uninstall,
@@ -269,8 +257,7 @@ export default {
           data: {},
         });
 
-        // Update state optimistically
-        row.state = states.uninstalling;
+        row.state = states.notInstalled;
 
         this.$store.dispatch('growl/success', {
           title: this.t('codezero.success.uninstalled', { cluster: row.name })
