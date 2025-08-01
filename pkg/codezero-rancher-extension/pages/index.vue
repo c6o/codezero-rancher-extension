@@ -143,15 +143,8 @@ export default {
 
     async getCodezeroState(cluster) {
       try {
-        // Extract the actual cluster name, handling fleet-local/ prefix
-        let clusterId = cluster.id;
-        if (clusterId.includes('/')) {
-          clusterId = clusterId.split('/').pop(); // Get the part after the last slash
-        }
-
-
         const apps = await this.$store.dispatch('cluster/request', {
-          url: `/k8s/clusters/${clusterId}/v1/catalog.cattle.io.apps?exclude=metadata.managedFields`,
+          url: `/k8s/clusters/${cluster.id}/v1/catalog.cattle.io.apps?exclude=metadata.managedFields`,
         });
 
         console.log('store: ', this.$store);
@@ -216,7 +209,7 @@ export default {
                   apikey: this.apiKey,
                 },
                 space: {
-                  name: cluster.spec.displayName,
+                  name: row.cluster.spec.displayName,
                 }
               }
             }
@@ -225,13 +218,13 @@ export default {
           timeout: "600s",
           wait: true,
           namespace: "codezero",
-          // projectId: `${clusterId}/${projectId}`,
+          // projectId: `${row.cluster.id}/${projectId}`,
           disableOpenAPIValidation: false,
           skipCRDs: false
         };
 
         this.$store.dispatch('cluster/request', {
-          url: `/k8s/clusters/${clusterId}/v1/catalog.cattle.io.clusterrepos/${repo.id}?action=install`,
+          url: `/k8s/clusters/${row.cluster.id}/v1/catalog.cattle.io.clusterrepos/${repo.id}?action=install`,
           method: 'POST',
           data,
         })
