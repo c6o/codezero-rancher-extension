@@ -191,7 +191,7 @@ export default {
     async installCodezero(row) {
       try {
         const repos = await this.$store.dispatch('cluster/request', {
-          url: `/k8s/clusters/${cluster.id}/v1/catalog.cattle.io.clusterrepos?exclude=metadata.managedFields`,
+          url: `/k8s/clusters/${row.cluster.id}/v1/catalog.cattle.io.clusterrepos?exclude=metadata.managedFields`,
         });
 
         let repo = repos.data.find(r => (r.spec?.gitBranch ? r.spec?.gitRepo : r.spec?.url) === 'https://charts.codezero.io');
