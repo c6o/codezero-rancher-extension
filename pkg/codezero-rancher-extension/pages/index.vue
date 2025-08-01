@@ -39,8 +39,8 @@
       </template>
 
       <template #cell:state="{ row }">
-        <span class="badge" :class="`badge--${getStateColor(row.state)}`">
-          {{ row.state }}
+        <span class="badge" :class="`badge--${getStateColor(row.installState)}`">
+          {{ row.installState }}
         </span>
       </template>
     </ResourceTable>
@@ -92,10 +92,10 @@ export default {
           width: 300
         },
         {
-          name: 'state',
-          labelKey: 'codezero.state',
-          value: 'state',
-          sort: ['state'],
+          name: 'installState',
+          labelKey: 'codezero.installState',
+          value: 'installState',
+          sort: ['installState'],
           width: 150
         }
       ]
@@ -115,7 +115,7 @@ export default {
           const row = {
             id: cluster.id,
             name: cluster.spec.displayName,
-            state: states.checking,
+            installState: states.checking,
             app: null,
             cluster: cluster,
             installing: false,
@@ -188,7 +188,7 @@ export default {
       }
 
       try {
-        row.state = states.installing;
+        row.installState = states.installing;
 
         const repos = await this.$store.dispatch('cluster/request', {
           url: `/k8s/clusters/${row.cluster.id}/v1/catalog.cattle.io.clusterrepos?exclude=metadata.managedFields`,
@@ -237,7 +237,7 @@ export default {
           data,
         });
 
-        row.state = states.installed;
+        row.installState = states.installed;
 
         this.$store.dispatch('growl/success', {
           title: this.t('codezero.success.installed', { cluster: row.name })
@@ -255,7 +255,7 @@ export default {
 
     async uninstallCodezero(row) {
       try {
-        row.state = states.uninstalling;
+        row.installState = states.uninstalling;
 
         // Delete Helm chart
         await this.$store.dispatch('cluster/request', {
@@ -264,7 +264,7 @@ export default {
           data: {},
         });
 
-        row.state = states.notInstalled;
+        row.installState = states.notInstalled;
 
         this.$store.dispatch('growl/success', {
           title: this.t('codezero.success.uninstalled', { cluster: row.name })
@@ -282,7 +282,7 @@ export default {
 
     async refreshSingleCluster(row) {
       const { state, app } = await this.getCodezeroState(row.cluster);
-      row.state = state;
+      row.installState = state;
       row.app = app;
 
       row.availableActions = [
@@ -290,13 +290,13 @@ export default {
           action: 'install',
           label: this.t('codezero.install'),
           icon: 'icon icon-plus',
-          enabled: row.state === 'Not Installed'
+          enabled: row.installState === 'Not Installed'
         },
         {
           action: 'uninstall',
           label: this.t('codezero.uninstall'),
           icon: 'icon icon-minus',
-          enabled: (row.state === 'Installed' || row.state === 'Failed')
+          enabled: (row.installState === 'Installed' || row.installState === 'Failed')
         },
         {
           action: 'refresh',

@@ -2,7 +2,7 @@ codezero:
   title: "Codezero"
   subtitle: "Manage Codezero installation across your clusters"
   cluster: "Cluster"
-  state: "State"
+  installState: "State"
   actions: "Actions"
   install: "Install"
   uninstall: "Uninstall"
