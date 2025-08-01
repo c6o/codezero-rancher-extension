@@ -38,7 +38,7 @@
         </div>
       </template>
 
-      <template #cell:state="{ row }">
+      <template #cell:installState="{ row }">
         <span class="badge" :class="`badge--${getStateColor(row.installState)}`">
           {{ row.installState }}
         </span>
