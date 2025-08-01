@@ -52,7 +52,6 @@ import SimpleBox from '@shell/components/SimpleBox';
 import { LabeledInput } from '@components/Form/LabeledInput';
 import Loading from '@shell/components/Loading';
 import ResourceTable from '@shell/components/ResourceTable';
-import { createHelmRepository, getHelmRepositoryExact, refreshHelmRepository } from '@shell/utils/uiplugins';
 import { MANAGEMENT } from '@shell/config/types';
 
 const states = {
@@ -152,7 +151,7 @@ export default {
         console.log('store: ', this.$store);
         console.log('getCodezeroState: Found apps:', apps);
 
-        const app = apps.data?.find(app => app?.spec?.metadata?.name === 'codezero');
+        const app = apps.data?.find(app => app?.spec?.chart?.metadata?.name === 'codezero');
 
         if (!app) {
           return { state: states.notInstalled };
