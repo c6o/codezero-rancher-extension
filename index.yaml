@@ -13,13 +13,13 @@ entries:
       catalog.cattle.io/ui-extensions-version: '>= 3.0.0 < 4.0.0'
     apiVersion: v2
     appVersion: 0.1.0
-    created: "2025-08-01T05:29:32.297120296Z"
+    created: "2025-08-01T05:36:21.509678611Z"
     description: Codezero One-Click Installation for Rancher Clusters.
-    digest: d56a81b23c1c5b33e238e08fd553559ed2222a2270d7eea85e8e0887c1ef7011
+    digest: ccff95795f272b9a2e76e82096e3b10b6106a4d8e32cf17797ea1258af837e0c
     icon: https://raw.githubusercontent.com/c6o/codezero-rancher-extension/refs/heads/main/pkg/codezero-rancher-extension/assets/logo.svg
     name: codezero-rancher-extension
     type: application
     urls:
     - assets/codezero-rancher-extension/codezero-rancher-extension-0.1.0.tgz
     version: 0.1.0
-generated: "2025-08-01T05:29:32.296062639Z"
+generated: "2025-08-01T05:36:21.509074839Z"
