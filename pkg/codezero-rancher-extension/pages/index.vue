@@ -59,7 +59,6 @@ const states = {
   notInstalled: 'Not Installed',
   installing: 'Installing',
   uninstalling: 'Uninstalling',
-  failed: 'Failed',
   error: 'Error',
   checking: 'Checking',
 }
@@ -103,6 +102,9 @@ export default {
   },
 
   methods: {
+    setInstallState(row, state) {
+      row.installState = state;
+    },
     async loadClusters() {
       try {
         const clusters = await this.$store.dispatch('management/findAll', { type: MANAGEMENT.CLUSTER });
@@ -188,7 +190,7 @@ export default {
       }
 
       try {
-        row.installState = states.installing;
+        this.setInstallState(row, states.installing);
 
         const repos = await this.$store.dispatch('cluster/request', {
           url: `/k8s/clusters/${row.cluster.id}/v1/catalog.cattle.io.clusterrepos?exclude=metadata.managedFields`,
@@ -237,7 +239,7 @@ export default {
           data,
         });
 
-        row.installState = states.installed;
+        this.setInstallState(row, states.installed);
 
         this.$store.dispatch('growl/success', {
           title: this.t('codezero.success.installed', { cluster: row.name })
@@ -248,14 +250,12 @@ export default {
           title: this.t('codezero.error.install', { cluster: row.name }),
           err: error
         }, { root: true });
-      } finally {
-        row.installing = false;
       }
     },
 
     async uninstallCodezero(row) {
       try {
-        row.installState = states.uninstalling;
+        this.setInstallState(row, states.uninstalling);
 
         // Delete Helm chart
         await this.$store.dispatch('cluster/request', {
@@ -264,7 +264,7 @@ export default {
           data: {},
         });
 
-        row.installState = states.notInstalled;
+        this.setInstallState(row, states.notInstalled);
 
         this.$store.dispatch('growl/success', {
           title: this.t('codezero.success.uninstalled', { cluster: row.name })
@@ -275,14 +275,12 @@ export default {
           title: this.t('codezero.error.uninstall', { cluster: row.name }),
           err: error
         }, { root: true });
-      } finally {
-        row.uninstalling = false;
       }
     },
 
     async refreshSingleCluster(row) {
       const { state, app } = await this.getCodezeroState(row.cluster);
-      row.installState = state;
+      this.setInstallState(row, state);
       row.app = app;
 
       row.availableActions = [
@@ -290,13 +288,13 @@ export default {
           action: 'install',
           label: this.t('codezero.install'),
           icon: 'icon icon-plus',
-          enabled: row.installState === 'Not Installed'
+          enabled: (row.installState === states.notInstalled || row.installState === states.error)
         },
         {
           action: 'uninstall',
           label: this.t('codezero.uninstall'),
           icon: 'icon icon-minus',
-          enabled: (row.installState === 'Installed' || row.installState === 'Failed')
+          enabled: (row.installState === states.installed || row.installState === states.error)
         },
         {
           action: 'refresh',
