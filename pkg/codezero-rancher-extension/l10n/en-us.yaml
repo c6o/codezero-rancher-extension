@@ -1,0 +1,20 @@
+codezero:
+  title: "Codezero"
+  subtitle: "Manage Codezero installations across your clusters"
+  cluster: "Cluster"
+  installState: "State"
+  actions: "Actions"
+  install: "Install"
+  uninstall: "Uninstall"
+  refresh: "Refresh"
+  noClusters: "No clusters found"
+  unavailable: "Unavailable"
+  success:
+    installed: "Codezero install started on cluster {cluster}"
+    uninstalled: "Codezero uninstall started on cluster {cluster}"
+  error:
+    loadClusters: "Failed to load clusters"
+    install: "Failed to install Codezero on cluster {cluster}"
+    uninstall: "Failed to uninstall Codezero from cluster {cluster}"
+    clusterNotReady: "Cluster {cluster} is not ready"
+    missingCredentials: "Please set your organization ID and API key."
